@@ -188,6 +188,7 @@ public class BinPackPartitionAssignor extends AbstractAssignor {
         }
         return assignment;
     }
+
     private static void doFirstRebalancing(
             final Map<String, List<TopicPartition>> assignment,
             final String topic,
@@ -218,6 +219,8 @@ public class BinPackPartitionAssignor extends AbstractAssignor {
         if (consumers.isEmpty()) {
             return;
         }
+        //instaed of this you might want to check if the nb of coumers is one and hence
+        //calling the controller foe the assignment is not critical
         if (firstRebalancing) {
             doFirstRebalancing(
                     assignment, topic, consumers, partitionLags);
@@ -274,11 +277,11 @@ public class BinPackPartitionAssignor extends AbstractAssignor {
         LOGGER.info("connected to server ");
         AssignmentResponse reply = assignmentServiceBlockingStub.getAssignment(request);
 
-        System.out.println("We have the following consumers");
+        LOGGER.info("We have the following consumers");
         for (Consumer c : reply.getConsumersList())
             LOGGER.info("consumer {}", c.getId());
 
-        System.out.println("We have the following Assignment");
+        LOGGER.info("We have the following Assignment");
 
         for (Consumer c : reply.getConsumersList()) {
             LOGGER.info("Consumer {} has the following Assignment " , c.getId());
@@ -287,7 +290,6 @@ public class BinPackPartitionAssignor extends AbstractAssignor {
 
             }
         }
-
         managedChannel.shutdownNow();
         return reply.getConsumersList();
     }
