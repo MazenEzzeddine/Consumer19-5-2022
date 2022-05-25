@@ -287,6 +287,8 @@ public class BinPackPartitionAssignor extends AbstractAssignor {
 
             }
         }
+
+        managedChannel.shutdownNow();
         return reply.getConsumersList();
     }
 
