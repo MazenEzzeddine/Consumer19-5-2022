@@ -26,8 +26,8 @@ public class ConsumerThread implements Runnable {
         KafkaConsumerConfig config = KafkaConsumerConfig.fromEnv();
         log.info(KafkaConsumerConfig.class.getName() + ": {}", config.toString());
         Properties props = KafkaConsumerConfig.createProperties(config);
-        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, LagBasedPartitionAssignor.class.getName());
-        //props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, BinPackPartitionAssignor.class.getName());
+        //props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, LagBasedPartitionAssignor.class.getName());
+        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, BinPackPartitionAssignor.class.getName());
         //props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, CooperativeStickyAssignor.class.getName());
          //props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, StickyAssignor.class.getName());
         boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
@@ -70,19 +70,19 @@ public class ConsumerThread implements Runnable {
                             eventsViolating++;
                         }
                         //TODO sleep per record or per batch
-                       /* try {
+                        try {
                             Thread.sleep(Long.parseLong(config.getSleep()));
                             log.info("Sleeping for {}", config.getSleep());
                         } catch (InterruptedException e) {
                             e.printStackTrace();
-                        }*/
+                        }
                     }
-                     try {
+                    /* try {
                             Thread.sleep(1000);
                             log.info("Sleeping for {}", config.getSleep());
                         } catch (InterruptedException e) {
                             e.printStackTrace();
-                        }
+                        }*/
                     //getProcessingLatencyForEachEvent(records);
                     if (commit) {
                         consumer.commitSync();
@@ -123,27 +123,5 @@ public class ConsumerThread implements Runnable {
 
 
 
-  /*  private static void getProcessingLatencyForEachEvent(ConsumerRecords<String, Customer> records) {
 
-        for (ConsumerRecord<String, Customer> record : records) {
-            totalEvents++;
-            log.info("System.currentTimeMillis() - record.timestamp() {}"
-                    , System.currentTimeMillis() - record.timestamp());
-            if (System.currentTimeMillis() - record.timestamp() <= 5000) {
-
-                eventsNonViolating++;
-            }else {
-                eventsViolating++;
-            }
-        }
-
-        double percentViolating = (double) eventsViolating/(double)totalEvents;
-        double percentNonViolating = (double) eventsNonViolating/(double)totalEvents;
-
-
-        log.info("Percent violating so far {}", percentViolating);
-        log.info("Percent non violating so far {}", percentNonViolating);
-        log.info("total events {}", totalEvents);
-
-    }*/
 }

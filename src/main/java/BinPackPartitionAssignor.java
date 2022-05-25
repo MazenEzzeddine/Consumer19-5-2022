@@ -196,7 +196,8 @@ public class BinPackPartitionAssignor extends AbstractAssignor {
         if (consumers.isEmpty()) {
             return;
         }
-        // Track total lag assigned to each consumer (for the current topic)
+        // There is only one consumer assignnig  it all the consumers
+        // atttention whenever consumers.size == 1, no need to call the controller for the assignment.
         String memberId = consumers.get(0);
         LOGGER.info("Looks like all the assignment is going to {}", memberId);
         for (TopicPartition p : partitions) {
@@ -212,6 +213,7 @@ public class BinPackPartitionAssignor extends AbstractAssignor {
             final Map<String, List<TopicPartition>> assignment,
             final String topic,
             final List<String> consumers,
+            //partition lags can be removed.
             final List<TopicPartition> partitionLags) {
         if (consumers.isEmpty()) {
             return;
@@ -229,7 +231,7 @@ public class BinPackPartitionAssignor extends AbstractAssignor {
         List<Consumer> asscons = callForAssignment();
         int controllerconsindex = 0;
         for (String co : consumers) {
-            LOGGER.info("consumer out of controller  {}", asscons.get(controllerconsindex));
+            LOGGER.info("consumer out of controller  {}", asscons.get(controllerconsindex).getId());
             List<TopicPartition> listtp = new ArrayList<>();
             LOGGER.info("Assigning for kafka consumer {}", co);
             for (Partition p : asscons.get(controllerconsindex).getAssignedPartitionsList()) {
@@ -269,19 +271,19 @@ public class BinPackPartitionAssignor extends AbstractAssignor {
         AssignmentServiceGrpc.AssignmentServiceBlockingStub assignmentServiceBlockingStub = AssignmentServiceGrpc.newBlockingStub(managedChannel);
         AssignmentRequest request = AssignmentRequest.newBuilder().setRequest("Give me the Assignment plz").build();
 
-        System.out.println("connected to server ");
+        LOGGER.info("connected to server ");
         AssignmentResponse reply = assignmentServiceBlockingStub.getAssignment(request);
 
         System.out.println("We have the following consumers");
         for (Consumer c : reply.getConsumersList())
-            System.out.println(c.getId());
+            LOGGER.info("consumer {}", c.getId());
 
         System.out.println("We have the following Assignment");
 
         for (Consumer c : reply.getConsumersList()) {
-            System.out.println("Consumer {} has the following Assignment " + c.getId());
+            LOGGER.info("Consumer {} has the following Assignment " , c.getId());
             for (Partition p : c.getAssignedPartitionsList()) {
-                System.out.println("partition " + p.getId());
+                LOGGER.info("partition {}" ,  p.getId());
 
             }
         }
@@ -303,7 +305,6 @@ public class BinPackPartitionAssignor extends AbstractAssignor {
                 final List<TopicPartition> topicPartitions = topicPartitionInfo.stream().map(
                         (PartitionInfo p) -> new TopicPartition(p.topic(), p.partition())
                 ).collect(Collectors.toList());
-
 
                 topicpartitions.put(topic, topicPartitions);
 
