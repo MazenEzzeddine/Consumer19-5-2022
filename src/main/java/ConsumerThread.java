@@ -72,7 +72,7 @@ public class ConsumerThread implements Runnable {
                         //TODO sleep per record or per batch
                         try {
                             Thread.sleep(Long.parseLong(config.getSleep()));
-                            log.info("Sleeping for {}", config.getSleep());
+                           // log.info("Sleeping for {}", config.getSleep());
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -108,6 +108,9 @@ public class ConsumerThread implements Runnable {
                     log.info("Percent violating so far {}", percentViolating);
                     log.info("Percent non violating so far {}", percentNonViolating);
                     log.info("total events {}", totalEvents);
+                    log.info("Number of events non violating {}", eventsNonViolating);
+                    log.info(" Number of events violating {}", eventsViolating);
+
                 }
             }
         } catch (WakeupException e) {
